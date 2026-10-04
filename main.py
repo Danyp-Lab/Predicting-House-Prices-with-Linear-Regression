@@ -1,26 +1,44 @@
-# Import necessary libraries
+"""
+California Housing Price Prediction using Linear Regression
+Modernized for PEP standards with type hints and structured execution.
+"""
+
+from typing import Any
 import pandas as pd
 from sklearn.datasets import fetch_california_housing
-from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.model_selection import train_test_split
 
-# Load the California housing dataset
-housing = fetch_california_housing(as_frame=True)
 
-# Split the dataset into training and testing sets
-X_train, X_test, y_train, y_test = train_test_split(
-    housing.data, housing.target, test_size=0.2, random_state=42)
+def train_linear_model(
+    test_size: float = 0.2, random_state: int = 42
+) -> tuple[float, float, LinearRegression]:
+    """Load California housing dataset, train Linear Regression, and return evaluation metrics."""
+    housing: Any = fetch_california_housing(as_frame=True)
+    x_train, x_test, y_train, y_test = train_test_split(
+        housing.data, housing.target, test_size=test_size, random_state=random_state
+    )
 
-# Create a linear regression model
-lin_reg = LinearRegression()
+    lin_reg = LinearRegression()
+    lin_reg.fit(x_train, y_train)
 
-# Fit the model to the training data
-lin_reg.fit(X_train, y_train)
+    y_pred = lin_reg.predict(x_test)
+    mse = float(mean_squared_error(y_test, y_pred))
+    r2 = float(r2_score(y_test, y_pred))
 
-# Make predictions on the testing data
-y_pred = lin_reg.predict(X_test)
+    return mse, r2, lin_reg
 
-# Print the mean squared error and R2 score
-print('Mean Squared Error:', mean_squared_error(y_test, y_pred))
-print('R2 Score:', r2_score(y_test, y_pred))
+
+def main() -> None:
+    mse, r2, _ = train_linear_model()
+    print("=" * 50)
+    print("🏡 California Housing Regression Results")
+    print("=" * 50)
+    print(f"Mean Squared Error (MSE): {mse:.4f}")
+    print(f"R² Score:                 {r2:.4f}")
+    print("=" * 50)
+
+
+if __name__ == "__main__":
+    main()
